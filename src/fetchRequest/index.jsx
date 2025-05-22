@@ -1,3 +1,4 @@
+const REACT_APP_BACKEND_URL = process.env.BACKEND_URL;
 const makeRequest = async (endpoint, options) => {
     const method = options.method || 'GET';
     const body = options.body ? JSON.stringify(options.body) : null;
@@ -7,7 +8,7 @@ const makeRequest = async (endpoint, options) => {
     if(body) config.body = {body};
 
     try{
-        const response = await fetch(`http://localhost:5555${endpoint}`);
+        const response = await fetch(`${REACT_APP_BACKEND_URL}${endpoint}`,config);
         if(!response.ok){
             throw new Error("Error in making request to server");
         }

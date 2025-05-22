@@ -18,10 +18,10 @@ const SignUp = () => {
       setloading(true);
       const result = await makeRequest("sign-up", { body: values });
       notification.success({
-        message : "Sign-up successfully",
+        message: "Sign-up successfully",
         placement: "topRight",
-        duration: 2
-      })
+        duration: 2,
+      });
       setloading(false);
       navigate("/sign-in");
     } catch (err) {
@@ -51,30 +51,51 @@ const SignUp = () => {
         </Title>
 
         <Form layout="horizontal" form={form} onFinish={onFinish}>
-          <Form.Item label="Name">
+          <Form.Item label="Name" name="name">
             <Input placeholder="Enter Name" />
           </Form.Item>
 
-          <Form.Item label="Email">
-            <Input placeholder="Enteer Email" />
+          <Form.Item name="email" label="Email" rules={[{ type: "email" }]}>
+            <Input placeholder="Your email" />
           </Form.Item>
 
-          <Form.Item label="Password">
-            <Input.Password
-              placeholder="Enter password"
-              iconRender={(visible) =>
-                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-              }
-            />
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input.Password />
           </Form.Item>
 
-          <Form.Item label="Password">
-            <Input.Password
-              placeholder="Enter password"
-              iconRender={(visible) =>
-                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-              }
-            />
+          <Form.Item
+            name="confirm"
+            label="Confirm Password"
+            dependencies={["password"]}
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: "Please confirm your password!",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("The new password that you entered do not match!")
+                  );
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
           </Form.Item>
 
           <Form.Item style={{ display: "flex", justifyContent: "center" }}>
