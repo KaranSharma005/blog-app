@@ -16,12 +16,14 @@ const SignUp = () => {
     console.log(values);
     try {
       setloading(true);
-      const result = await makeRequest("sign-up", { body: values });
+
+      const result = await makeRequest("/api/signup", { body: values,method : 'POST'});
       notification.success({
-        message: "Sign-up successfully",
+        message: result.msg || "User Signed in Successfully",
         placement: "topRight",
         duration: 2,
       });
+
       setloading(false);
       navigate("/sign-in");
     } catch (err) {

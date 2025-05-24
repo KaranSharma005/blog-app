@@ -1,10 +1,46 @@
-import { Card, Typography, Form, Input, Button } from "antd";
+import {
+  Card,
+  Typography,
+  Form,
+  Input,
+  Button,
+  notification,
+  Flex,
+  Spin
+} from "antd";
 import { useState } from "react";
+import { loginUser } from "../slices/thunks";
+import { useDispatch } from "react-redux";
 
 const { Title } = Typography;
 const SignIn = () => {
   const [form] = Form.useForm();
+  const [loading, setloading] = useState(false);
+  const dispatch = useDispatch();
 
+  async function onFinish(values) {
+    try {
+      setloading(true);
+      const response = await dispatch(loginUser(values));
+      console.log(response);
+      
+      notification.success({
+        message: response.msg || "User logged in Successfully",
+        placement: "topRight",
+        duration: 2,
+      });
+
+      setloading(false);
+    } catch (err) {
+      setloading(false);
+      notification.error({
+        message: "Sign in Error",
+        description: err.message,
+        placement: "topRight",
+        duration: 4,
+      });
+    }
+  }
 
   return (
     <>
@@ -21,10 +57,12 @@ const SignIn = () => {
           Sign-in to your account
         </Title>
 
-        <Form layout="horizontal" form={form} >
-
-          <Form.Item name="email" label="Email" rules={[{ type: "email", required : true
-           }]}>
+        <Form layout="horizontal" form={form} onFinish={onFinish}>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ type: "email", required: true }]}
+          >
             <Input />
           </Form.Item>
 
@@ -42,12 +80,18 @@ const SignIn = () => {
           </Form.Item>
 
           <Form.Item style={{ display: "flex", justifyContent: "center" }}>
-            <Button type="primary" htmlType="submit" >
+            <Button type="primary" htmlType="submit">
               Submit
             </Button>
           </Form.Item>
         </Form>
       </Card>
+
+      {loading && (
+        <Flex align="center" justify="center">
+          <Spin size="large" />
+        </Flex>
+      )}
     </>
   );
 };

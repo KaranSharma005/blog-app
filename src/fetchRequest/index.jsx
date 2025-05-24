@@ -1,22 +1,25 @@
-const REACT_APP_BACKEND_URL = process.env.BACKEND_URL;
+const REACT_APP_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 const makeRequest = async (endpoint, options) => {
     const method = options.method || 'GET';
     const body = options.body ? JSON.stringify(options.body) : null;
     const headers = options.headers || {'Content-Type' : 'application/json'};
 
-    const config = {method, headers};
-    if(body) config.body = {body};
+    const config = {method, headers,credentials: 'include'};
+    if(body) config.body = body;
 
     try{
         const response = await fetch(`${REACT_APP_BACKEND_URL}${endpoint}`,config);
+        const data = await response.json();
         if(!response.ok){
-            throw new Error("Error in making request to server");
+            throw new Error(data.msg || data.message || "Something went wrong");
         }
+        console.log(data);
 
-        return await response.json();
+        return data;
+        
     }
     catch(err){
-        console.error(err);
         throw err;
     }
 }
