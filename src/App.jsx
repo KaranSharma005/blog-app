@@ -1,10 +1,10 @@
-import router from './routes/index'
 import { RouterProvider } from 'react-router-dom'
 import ReactDOM from "react-dom/client";
+import RouterSwitcher from './routes/routeSwitcher';
 
 const App = () => {
     return (
-        <RouterProvider router={router} />
+        <RouterSwitcher/>
     )
 }
 

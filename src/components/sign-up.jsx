@@ -1,7 +1,6 @@
 import { Card, Form, Button, Input, notification, Spin, Flex } from "antd";
 import { Typography } from "antd";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import makeRequest from "../fetchRequest";
+import makeRequest from "./fetchRequest";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -49,15 +48,15 @@ const SignUp = () => {
         }}
       >
         <Title style={{ textAlign: "center", color: "#537D5D" }}>
-          Sign-up to blog website
+          Sign up to Testify
         </Title>
 
         <Form layout="horizontal" form={form} onFinish={onFinish}>
-          <Form.Item label="Name" name="name">
+          <Form.Item label="Name" name="name" rules={[{required: true,}]}>
             <Input placeholder="Enter Name" />
           </Form.Item>
 
-          <Form.Item name="email" label="Email" rules={[{ type: "email" }]}>
+          <Form.Item name="email" label="Email" rules={[{ type: "email",required: true, }]}>
             <Input placeholder="Your email" />
           </Form.Item>
 
@@ -107,12 +106,12 @@ const SignUp = () => {
           </Form.Item>
         </Form>
 
-        {loading && (
+      </Card>
+      {loading && (
           <Flex align="center" justify="center">
             <Spin size="large" />
           </Flex>
         )}
-      </Card>
     </>
   );
 };

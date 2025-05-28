@@ -8,8 +8,9 @@ const router = createBrowserRouter([
     element: <SignUp />,
   },
   {
-    path:"/sign-in",
-    element: <SignIn/>
-  }
+    path: "/sign-in",
+    element: <SignIn />,
+  },
+  
 ]);
 export default router;

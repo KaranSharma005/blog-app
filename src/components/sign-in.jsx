@@ -9,14 +9,24 @@ import {
   Spin
 } from "antd";
 import { useState } from "react";
-import { loginUser } from "../slices/thunks";
-import { useDispatch } from "react-redux";
+import { loginUser } from "../store/slices/thunks";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const { Title } = Typography;
 const SignIn = () => {
   const [form] = Form.useForm();
   const [loading, setloading] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn]);
 
   async function onFinish(values) {
     try {
@@ -80,18 +90,17 @@ const SignIn = () => {
           </Form.Item>
 
           <Form.Item style={{ display: "flex", justifyContent: "center" }}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" disabled={loading}>
               Submit
             </Button>
           </Form.Item>
         </Form>
-      </Card>
-
-      {loading && (
+        {loading && (
         <Flex align="center" justify="center">
           <Spin size="large" />
         </Flex>
       )}
+      </Card>
     </>
   );
 };
