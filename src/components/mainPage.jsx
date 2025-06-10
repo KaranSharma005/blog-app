@@ -1,21 +1,34 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Layout } from "antd";
-const { Header, Footer, Sider, Content } = Layout;
+import HeaderComponent from './header';
+import Sidebar from "./sidebar";
+import ContentArea from "./contentArea";
+const { Content } = Layout;
 
 const MainPage = () => {
-  const isAdmin = useSelector((state) => state.isAdmin);
+  const userInfo = useSelector((state) => state?.userDetails);
+  const isAdmin = userInfo?.isAdmin;
+  const textColor = "#003049";  
   return (
     <>
       {isAdmin && (
-        <Layout>
-          <Header>Header</Header>
+        <Layout style={{ minHeight: "100vh", margin: 0, padding: 0 }}>
+          <HeaderComponent/>
+
           <Layout>
-            <Sider width="25%" >
-              Sider
-            </Sider>
-            <Content>Content</Content>
+            <Sidebar/>
+            <Content
+              style={{
+                margin: "16px",
+                padding: 24,
+                background: "#ffffff",
+                borderRadius: 8,
+                color: textColor
+              }}
+            >
+              <ContentArea/> 
+            </Content>
           </Layout>
-          <Footer>Footer</Footer>
         </Layout>
       )}
     </>

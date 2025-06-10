@@ -20,7 +20,7 @@ const SignIn = () => {
   const [loading, setloading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn.isLoggedIn);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -32,7 +32,6 @@ const SignIn = () => {
     try {
       setloading(true);
       const response = await dispatch(loginUser(values));
-      console.log(response);
       
       notification.success({
         message: response.msg || "User logged in Successfully",

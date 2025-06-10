@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import loginSlice from './slices/loginSlice';
-import roleSlice from './slices/roleSlice';
+import infoSlice from './slices/infoSlice';
+import menuIndexSlice from './slices/menuIndexSlice'
 
 const store =configureStore({
     reducer: {
         isLoggedIn : loginSlice,
-        isAdmin : roleSlice
+        userDetails : infoSlice,
+        selectedIndexOfMenu : menuIndexSlice,
     },
 })
 
