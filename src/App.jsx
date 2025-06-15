@@ -17,7 +17,6 @@ const App = () => {
         method: "GET",
       });
       if(result?.loggedIn == true){
-        console.log("kljerio");
           await dispatch(setLoginStatus(true));
           await dispatch(setUserInfo(result?.userData));
       }

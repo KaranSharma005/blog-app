@@ -9,12 +9,13 @@ import { Spin ,
 const RouterSwitcher = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn.isLoggedIn);
   const isAuthChecked = useSelector((state) => state.isLoggedIn.isAuthChecked);
+  console.log("Login State:", isLoggedIn, "Auth Checked:", isAuthChecked);
 
   if(!isAuthChecked){
     return (
       <Flex align="center" justify="center">
           <Spin size="large" />
-        </Flex>
+      </Flex>
     )
   }
 

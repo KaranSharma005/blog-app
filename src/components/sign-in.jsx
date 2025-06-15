@@ -28,6 +28,10 @@ const SignIn = () => {
     }
   }, [isLoggedIn]);
 
+  useEffect(() => {
+  console.log("SignIn component mounted");
+}, []);
+
   async function onFinish(values) {
     try {
       setloading(true);

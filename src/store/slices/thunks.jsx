@@ -1,6 +1,7 @@
 import makeRequest from "../../components/fetchRequest";
-import { setLoginStatus } from "./loginSlice";
+import { setAuthChecked, setLoginStatus } from "./loginSlice";
 import { setUserInfo } from "./infoSlice";
+
 
 const loginUser = (payload) => async (dispatch) => {
   try {
@@ -18,7 +19,7 @@ const loginUser = (payload) => async (dispatch) => {
     return response;
   } catch (err) {
     await dispatch(setLoginStatus(false));
-    throw new Error(err);
+    throw err;
   }
 };
 
@@ -31,8 +32,44 @@ const addStudent = (payload) => async (dispatch) => {
   }
   catch(err){
     console.log(err);
-    
+    throw err;
   }
 }
 
-export {loginUser, addStudent};
+const deleteStudent = (id) => async() => {
+  try{
+    const response = await makeRequest(`/student/deleteStudent?id=${id}`,{
+      method : "DELETE"
+    })
+    return response?.message || "Student deleted successfully";
+  }
+  catch(err){
+    console.log(err.message);
+    throw err;
+  }
+}
+
+const logout = () => async (dispatch) => {
+  try{
+    const response = await makeRequest("/api/logout",{
+      method : "DELETE"
+    });
+    if(response?.success){
+      await dispatch(setLoginStatus(false));
+      await dispatch(setUserInfo({}));
+    }
+    
+    return response;
+  }
+  catch(err){
+    console.log(err.message);
+    throw err;
+  }
+}
+
+export {
+  loginUser, 
+  addStudent, 
+  deleteStudent,
+  logout
+};

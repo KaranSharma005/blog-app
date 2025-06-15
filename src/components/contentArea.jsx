@@ -9,13 +9,16 @@ import {
   Spin,
   Layout,
   Table,
+  notification,
 } from "antd";
-import React,{ useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { addStudent } from "../store/slices/thunks";
+import { addStudent, deleteStudent, logout } from "../store/slices/thunks";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import makeRequest from "./fetchRequest";
 const { Content } = Layout;
+
 const ContentArea = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,25 +26,52 @@ const ContentArea = () => {
   const dispatch = useDispatch();
   const menuIndex = useSelector((state) => state.selectedIndexOfMenu);
   const [tableEnteries, setTableEnteries] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchData(){
-      if(menuIndex ==1){
-        try{
-        const response = await makeRequest("/student/getAll", { method : 'GET'});
-        setTableEnteries((prevEnteries) => [...prevEnteries,...(response.data || [])]);
-      }
-      catch(err){
-        notification.error({
-        description: err.message,
-        placement: "topRight",
-        duration: 3,
-      });
-      }
+    async function fetchData() {
+      if (menuIndex == 1) {
+        try {
+          const response = await makeRequest("/student/getAll", {
+            method: "GET",
+          });
+          setTableEnteries(response?.data || []);
+        } catch (err) {
+          notification.error({
+            description: err?.message || "Error in fetching table records",
+            placement: "topRight",
+            duration: 2,
+          });
+        }
       }
     }
     fetchData();
-  },[menuIndex]);
+  }, [menuIndex]);
+
+  useEffect(() => {
+    const checkIndex = async () => {
+      if (menuIndex == 3) {
+        try {
+          const response = await dispatch(logout());
+          if (response?.success) {
+            notification.success({
+              message: response.msg || "User logged out Successfully",
+              placement: "topRight",
+              duration: 2,
+            });
+          }
+          navigate("/");
+        } catch (err) {
+          notification.error({
+            description: "Can't logout user at this time",
+            placement: "topRight",
+            duration: 2,
+          });
+        }
+      }
+    };
+    checkIndex();
+  }, [menuIndex]);
 
   const columns = [
     {
@@ -70,13 +100,38 @@ const ContentArea = () => {
     },
   ];
 
+  async function handleDelete(record) {
+    console.log(record);
+    try {
+      await dispatch(deleteStudent(record?._id));
+      const tabularData = tableEnteries.filter(
+        (item) => item._id != record._id
+      );
+      setTableEnteries(tabularData);
+    } catch (err) {
+      notification.error({
+        description: err?.message || "Error in deleting student",
+        placement: "topRight",
+        duration: 2,
+      });
+    }
+  }
+
   async function onFinish(values) {
-    setLoading(true);
-    await dispatch(addStudent(values));
-    setTableEnteries((prevEntries) => [...prevEntries, values]);
-    setOpen(false);
-    setLoading(false);
-    form.resetFields();
+    try {
+      setLoading(true);
+      await dispatch(addStudent(values));
+      setTableEnteries((prevEntries) => [...prevEntries, values]);
+      setOpen(false);
+      setLoading(false);
+      form.resetFields();
+    } catch (err) {
+      notification.error({
+        description: err?.message || "Error in adding student",
+        placement: "topRight",
+        duration: 2,
+      });
+    }
   }
 
   return (
@@ -165,7 +220,7 @@ const ContentArea = () => {
       </Drawer>
 
       <Content>
-        <Table dataSource={tableEnteries} columns={columns} />;
+        <Table dataSource={tableEnteries} columns={columns} rowKey="_id" />;
       </Content>
     </>
   );
