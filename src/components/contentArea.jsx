@@ -17,6 +17,7 @@ import { addStudent, deleteStudent, logout } from "../store/slices/thunks";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import makeRequest from "./fetchRequest";
+import TestList from '../components/testlist'
 const { Content } = Layout;
 
 const ContentArea = () => {
@@ -24,9 +25,10 @@ const ContentArea = () => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const menuIndex = useSelector((state) => state.selectedIndexOfMenu);
   const [tableEnteries, setTableEnteries] = useState([]);
   const navigate = useNavigate();
+  const isLoggedIn = useSelector((state) => state.isLoggedIn.isLoggedIn);
+  const menuIndex = useSelector((state) => state.selectedIndexOfMenu);
 
   useEffect(() => {
     async function fetchData() {
@@ -49,6 +51,12 @@ const ContentArea = () => {
   }, [menuIndex]);
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/"); 
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
     const checkIndex = async () => {
       if (menuIndex == 3) {
         try {
@@ -60,7 +68,6 @@ const ContentArea = () => {
               duration: 2,
             });
           }
-          navigate("/");
         } catch (err) {
           notification.error({
             description: "Can't logout user at this time",
@@ -219,9 +226,15 @@ const ContentArea = () => {
         </Form>
       </Drawer>
 
-      <Content>
-        <Table dataSource={tableEnteries} columns={columns} rowKey="_id" />;
-      </Content>
+      {menuIndex == 1 && (
+        <Content>
+          <Table dataSource={tableEnteries} columns={columns} rowKey="_id" />;
+        </Content>
+      )}
+
+      {menuIndex == 2 && (
+        <TestList/>
+      )}
     </>
   );
 };
