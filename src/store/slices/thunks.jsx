@@ -29,6 +29,7 @@ const addStudent = (payload) => async (dispatch) => {
       body: payload,
       method: "POST",
     });
+    return response?._id;
   }
   catch(err){
     console.log(err);

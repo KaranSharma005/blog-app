@@ -17,15 +17,16 @@ import { addStudent, deleteStudent, logout } from "../store/slices/thunks";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import makeRequest from "./fetchRequest";
-import TestList from '../components/testlist'
+import TestList from "../components/testlist";
 const { Content } = Layout;
 
 const ContentArea = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tableEnteries, setTableEnteries] = useState([]);
+  const [processDelete, setDeleteProcess] = useState(false);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const [tableEnteries, setTableEnteries] = useState([]);
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.isLoggedIn.isLoggedIn);
   const menuIndex = useSelector((state) => state.selectedIndexOfMenu);
@@ -52,7 +53,7 @@ const ContentArea = () => {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      navigate("/"); 
+      navigate("/");
     }
   }, [isLoggedIn]);
 
@@ -100,7 +101,7 @@ const ContentArea = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button danger onClick={() => handleDelete(record)}>
+        <Button danger onClick={() => handleDelete(record)} disabled={processDelete}>
           Delete
         </Button>
       ),
@@ -108,7 +109,7 @@ const ContentArea = () => {
   ];
 
   async function handleDelete(record) {
-    console.log(record);
+    setDeleteProcess(true);
     try {
       await dispatch(deleteStudent(record?._id));
       const tabularData = tableEnteries.filter(
@@ -122,12 +123,14 @@ const ContentArea = () => {
         duration: 2,
       });
     }
+    setDeleteProcess(false);
   }
 
   async function onFinish(values) {
     try {
       setLoading(true);
-      await dispatch(addStudent(values));
+      const id = await dispatch(addStudent(values));
+      values = { ...values, _id: id };
       setTableEnteries((prevEntries) => [...prevEntries, values]);
       setOpen(false);
       setLoading(false);
@@ -219,7 +222,7 @@ const ContentArea = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" disabled={loading}>
               Submit
             </Button>
           </Form.Item>
@@ -228,12 +231,17 @@ const ContentArea = () => {
 
       {menuIndex == 1 && (
         <Content>
-          <Table dataSource={tableEnteries} columns={columns} rowKey="_id" />;
+          {processDelete && (
+            <Flex align="center" gap="middle">
+              <Spin />
+            </Flex>
+          )}
+          <Table dataSource={tableEnteries} columns={columns} rowKey="_id" />
         </Content>
       )}
 
       {menuIndex == 2 && (
-        <TestList/>
+        <TestList /> // List of test history
       )}
     </>
   );
