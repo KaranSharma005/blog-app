@@ -12,11 +12,11 @@ import {
   notification,
   DatePicker,
   InputNumber,
+  Space,
 } from "antd";
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addTest, getTestList, deleteTest } from "../store/slices/thunks";
 import dayjs from "dayjs";
 const { Content } = Layout;
 
@@ -27,11 +27,22 @@ const TestList = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [tableEnteries, setTableEnteries] = useState([]);
-  const navigate = useNavigate();
 
-  function onFinish(values) {
-    console.log(values);
-    setTableEnteries((prev) => [...prev, values]);
+  async function handleDelete(record) {
+    try{
+      await dispatch(deleteTest(record._id));
+      console.log(record._id);
+      
+      const updatedEnteries = tableEnteries.filter((data) => data._id != record._id);
+      setTableEnteries(updatedEnteries);
+    }
+    catch(err){
+      notification.error({
+        description: "Can't delete test at this moment",
+        placement: "topRight",
+        duration: 2,
+      });
+    }
   }
 
   const requiredRule = [
@@ -93,12 +104,25 @@ const TestList = () => {
         return <p>-</p>;
       },
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button danger onClick={() => handleDelete(record)}>
+          Delete
+        </Button>
+      ),
+    },
   ];
 
   async function onFinish(values) {
     try {
-      console.log(values);
+      const response = await dispatch(addTest(values));
+      console.log(response,"sdchi");
+      alert("kchoi")
+      
       const formattedValues = {
+        _id: response._id,
         ...values,
         date: values.date.format("YYYY-MM-DD"),
       };
@@ -110,25 +134,23 @@ const TestList = () => {
       form.resetFields();
     } catch (err) {
       notification.error({
-        description: "Error in adding student",
+        description: "Error in adding test",
         placement: "topRight",
         duration: 2,
       });
     }
   }
 
+  useEffect(() => {
+    async function onloadFunction() {
+      const data = await dispatch(getTestList());
+      setTableEnteries(data);
+    }
+    onloadFunction();
+  }, []);
+
   return (
     <>
-      {menuIndex == 2 && (
-        <Row justify="end">
-          <Col>
-            <Button type="primary" size="large" onClick={() => setOpen(!open)}>
-              Schedule test
-            </Button>
-          </Col>
-        </Row>
-      )}
-
       <Drawer
         closable
         destroyOnHidden
@@ -168,7 +190,7 @@ const TestList = () => {
           </Form.Item>
 
           <Form.Item name="duration" label="Test Duration" rules={requiredRule}>
-            <InputNumber placeholder="Enter duration in minutes" />
+            <InputNumber min={1} placeholder="Enter duration in minutes" />
           </Form.Item>
 
           <Form.Item>
@@ -178,12 +200,31 @@ const TestList = () => {
           </Form.Item>
         </Form>
       </Drawer>
-      {tableEnteries?.length > 0 && (
-        <Content>
-          <Table dataSource={tableEnteries} columns={columns} />
-          {/*rowKey="_id"  */}
-        </Content>
-      )}
+      <Content>
+        <Space direction="vertical" style={{ display: "flex" }} size="large">
+          {menuIndex == 2 && (
+            <Row justify="end">
+              <Col>
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={() => setOpen(!open)}
+                >
+                  Schedule test
+                </Button>
+              </Col>
+            </Row>
+          )}
+          {tableEnteries?.length > 0 && (
+            <Table
+              dataSource={tableEnteries}
+              columns={columns}
+              rowKey="_id"
+              scroll={{ x: "max-content" }}
+            />
+          )}
+        </Space>
+      </Content>
     </>
   );
 };

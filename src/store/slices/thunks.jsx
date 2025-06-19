@@ -1,6 +1,7 @@
 import makeRequest from "../../components/fetchRequest";
-import { setAuthChecked, setLoginStatus } from "./loginSlice";
+import { setLoginStatus } from "./loginSlice";
 import { setUserInfo } from "./infoSlice";
+import dayjs from "dayjs";
 
 
 const loginUser = (payload) => async (dispatch) => {
@@ -32,7 +33,6 @@ const addStudent = (payload) => async (dispatch) => {
     return response?._id;
   }
   catch(err){
-    console.log(err);
     throw err;
   }
 }
@@ -45,7 +45,6 @@ const deleteStudent = (id) => async() => {
     return response?.message || "Student deleted successfully";
   }
   catch(err){
-    console.log(err.message);
     throw err;
   }
 }
@@ -63,7 +62,49 @@ const logout = () => async (dispatch) => {
     return response;
   }
   catch(err){
-    console.log(err.message);
+    throw err;
+  }
+}
+
+const addTest = (payload) => async(dispatch) => {
+  try{
+    const response = await makeRequest("/test/addTest",{
+      body : payload,
+      method : "POST"
+    });
+    return response;
+  }
+  catch(err){
+    throw err;
+  }
+}
+
+const getTestList = () => async(dispatch) => {
+  try{
+    const response = await makeRequest("/test/getAll", {
+      method : "GET",
+    });
+
+    const formattedData = response.data.map((ele) => {
+      return {
+        ...ele ,
+        date : dayjs(ele.date).format("YYYY-MM-DD")
+      }
+    })
+    return formattedData;
+  }
+  catch(err){
+    throw err;
+  }
+}
+
+const deleteTest = (id) => async (dispatch) => {
+  try{
+    const response = await makeRequest(`/test/delete?id=${id}`,{
+      method : "DELETE"
+    });
+  }
+  catch(err){
     throw err;
   }
 }
@@ -72,5 +113,8 @@ export {
   loginUser, 
   addStudent, 
   deleteStudent,
-  logout
+  logout, 
+  addTest,
+  getTestList,
+  deleteTest
 };
